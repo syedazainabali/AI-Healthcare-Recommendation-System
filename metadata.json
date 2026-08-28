@@ -1,0 +1,6 @@
+{
+  "name": "MedAI Pakistan",
+  "description": "AI-Powered Healthcare & Patient Record Management Platform for Pakistan",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
