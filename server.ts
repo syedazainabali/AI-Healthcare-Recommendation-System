@@ -1,8 +1,10 @@
+import mongoose from "mongoose";
 import express, { Request, Response } from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import Doctor from "./models/Doctor";
 
 dotenv.config();
 
@@ -1018,6 +1020,60 @@ app.get("/manifest.json", (_req: Request, res: Response) => {
 
 // Vite middleware & Static serving
 async function startServer() {
+  // Doctor API routes
+  app.get("/api/doctors", async (req: Request, res: Response) => {
+    try {
+      const doctors = await Doctor.find();
+
+      res.json({
+        success: true,
+        doctors,
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+      });
+    }
+  });
+
+  app.post("/api/doctors", async (req: Request, res: Response) => {
+    try {
+      const doctor = await Doctor.create(req.body);
+
+      res.status(201).json({
+        success: true,
+        doctor,
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        error: error.message,
+      });
+    }
+  });
+  app.delete("/api/doctors/:id", async (req: Request, res: Response) => {
+  try {
+    const doctor = await Doctor.findByIdAndDelete(req.params.id);
+
+    if (!doctor) {
+      return res.status(404).json({
+        success: false,
+        error: "Doctor not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Doctor deleted successfully",
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -1031,7 +1087,87 @@ async function startServer() {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }
+  await mongoose.connect(process.env.MONGODB_URI!);
+console.log("MongoDB connected successfully✅✅✅");
+app.get("/api/doctors", async (req: Request, res: Response) => {
+  try {
+    const doctors = await Doctor.find();
 
+    res.json({
+      success: true,
+      doctors,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+app.post("/api/doctors", async (req: Request, res: Response) => {
+  try {
+    const doctor = await Doctor.create(req.body);
+
+    res.status(201).json({
+      success: true,
+      doctor,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+app.put("/api/doctors/:id", async (req: Request, res: Response) => {
+  try {
+    const doctor = await Doctor.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!doctor) {
+      return res.status(404).json({
+        success: false,
+        error: "Doctor not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      doctor,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+app.delete("/api/doctors/:id", async (req: Request, res: Response) => {
+  try {
+     console.log("DELETE ROUTE HIT:", req.params.id);
+    const doctor = await Doctor.findByIdAndDelete(req.params.id);
+
+    if (!doctor) {
+      return res.status(404).json({
+        success: false,
+        error: "Doctor not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Doctor deleted successfully",
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`MedAI Pakistan server running on http://0.0.0.0:${PORT}`);
   });
