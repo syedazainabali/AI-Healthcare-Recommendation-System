@@ -191,7 +191,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Center: Top Navigation Bar (Visible on lg and xl screens) */}
-        <nav className="hidden xl:flex items-center gap-1 bg-slate-100/80 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-200/70 dark:border-slate-800">
+        <nav className="hidden 2xl:flex items-center gap-1 bg-slate-100/80 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-200/70 dark:border-slate-800">
           {topNavTabs.map((tab) => {
             const isActive = currentSection === tab.id;
             return (
@@ -509,7 +509,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Secondary Horizontal Navigation Bar for md and lg screens (so it never looks empty) */}
-      <div className="xl:hidden flex items-center gap-1 overflow-x-auto pb-1 no-scrollbar pt-1 border-t border-slate-100 dark:border-slate-800">
+      <div className="flex 2xl:hidden items-center gap-1 overflow-x-auto pb-1 no-scrollbar pt-1 border-t border-slate-100 dark:border-slate-800">
         {topNavTabs.map((tab) => {
           const isActive = currentSection === tab.id;
           return (

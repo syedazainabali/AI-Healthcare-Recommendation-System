@@ -15,6 +15,7 @@ import {
   Globe,
   LogOut,
   X,
+  ChevronLeft,
   ShieldCheck,
   HeartPulse,
 } from 'lucide-react';
@@ -45,6 +46,8 @@ interface SidebarProps {
   unreadNotifsCount: number;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
+  onToggleSidebar: () => void;
+  isSidebarDesktopOpen: boolean;
   onOpenLanding: () => void;
   onSignOut: () => void;
 }
@@ -69,6 +72,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   unreadNotifsCount,
   isOpenMobile,
   onCloseMobile,
+  onToggleSidebar,
+  isSidebarDesktopOpen,
   onOpenLanding,
   onSignOut,
 }) => {
@@ -79,83 +84,83 @@ export const Sidebar: React.FC<SidebarProps> = ({
     badge?: number;
     badgeColor?: string;
   }> = [
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: <LayoutDashboard className="w-4 h-4" />,
-    },
-    {
-      id: 'patients',
-      label: 'Patients',
-      icon: <Users className="w-4 h-4" />,
-    },
-    {
-      id: 'medical-history',
-      label: 'Medical History',
-      icon: <History className="w-4 h-4" />,
-    },
-    {
-      id: 'ai-recommendations',
-      label: 'AI Recommendations',
-      icon: <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />,
-      badge: pendingAICount,
-      badgeColor: 'bg-indigo-600 text-white font-bold',
-    },
-    {
-      id: 'reports',
-      label: 'Reports',
-      icon: <FileCheck2 className="w-4 h-4" />,
-    },
-    {
-      id: 'prescriptions',
-      label: 'Prescriptions',
-      icon: <Pill className="w-4 h-4" />,
-    },
-    {
-      id: 'appointments',
-      label: 'Appointments',
-      icon: <CalendarClock className="w-4 h-4" />,
-    },
-    {
-      id: 'doctors',
-      label: 'Doctors Directory',
-      icon: <Stethoscope className="w-4 h-4" />,
-    },
-    {
-      id: 'network',
-      label: 'Hospital Network',
-      icon: <Building2 className="w-4 h-4" />,
-    },
-  ];
+      {
+        id: 'dashboard',
+        label: 'Dashboard',
+        icon: <LayoutDashboard className="w-4 h-4" />,
+      },
+      {
+        id: 'patients',
+        label: 'Patients',
+        icon: <Users className="w-4 h-4" />,
+      },
+      {
+        id: 'medical-history',
+        label: 'Medical History',
+        icon: <History className="w-4 h-4" />,
+      },
+      {
+        id: 'ai-recommendations',
+        label: 'AI Recommendations',
+        icon: <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />,
+        badge: pendingAICount,
+        badgeColor: 'bg-indigo-600 text-white font-bold',
+      },
+      {
+        id: 'reports',
+        label: 'Reports',
+        icon: <FileCheck2 className="w-4 h-4" />,
+      },
+      {
+        id: 'prescriptions',
+        label: 'Prescriptions',
+        icon: <Pill className="w-4 h-4" />,
+      },
+      {
+        id: 'appointments',
+        label: 'Appointments',
+        icon: <CalendarClock className="w-4 h-4" />,
+      },
+      {
+        id: 'doctors',
+        label: 'Doctors Directory',
+        icon: <Stethoscope className="w-4 h-4" />,
+      },
+      {
+        id: 'network',
+        label: 'Hospital Network',
+        icon: <Building2 className="w-4 h-4" />,
+      },
+    ];
 
   const secondaryNavItems: Array<{
     id: NavSection;
     label: string;
     icon: React.ReactNode;
   }> = [
-    {
-      id: 'notifications',
-      label: 'Notifications & Alerts',
-      icon: (
-        <div className="relative">
-          <Bell className="w-4 h-4" />
-          {unreadNotifsCount > 0 && (
-            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-500" />
-          )}
-        </div>
-      ),
-    },
-    {
-      id: 'profile',
-      label: 'Doctor Profile',
-      icon: <User className="w-4 h-4" />,
-    },
-    {
-      id: 'settings',
-      label: 'System Settings',
-      icon: <Settings className="w-4 h-4" />,
-    },
-  ];
+      {
+        id: 'notifications',
+        label: 'Notifications & Alerts',
+        icon: (
+          <div className="relative">
+            <Bell className="w-4 h-4" />
+            {unreadNotifsCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-500" />
+            )}
+          </div>
+        ),
+      },
+      {
+        id: 'profile',
+        label: 'Doctor Profile',
+        icon: <User className="w-4 h-4" />,
+      },
+      {
+        id: 'settings',
+        label: 'System Settings',
+        icon: <Settings className="w-4 h-4" />,
+      },
+    ];
 
   const handleNavClick = (section: NavSection) => {
     onSelectSection(section);
@@ -174,24 +179,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <aside
         id="app-sidebar"
-        className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-white dark:bg-[#0F172A] border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          isOpenMobile ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
-        } no-print`}
+        className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-white dark:bg-[#0F172A] border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 ease-in-out no-print ${isOpenMobile
+            ? 'translate-x-0 shadow-2xl'
+            : '-translate-x-full'
+          } ${isSidebarDesktopOpen
+            ? 'lg:translate-x-0'
+            : 'lg:-translate-x-full'
+          }`}
       >
         {/* Sidebar Header with Logo */}
-        <div className="h-16 px-5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 flex-shrink-0 bg-white dark:bg-[#0F172A]">
+        {/* Sidebar Header with Logo */}
+        <div className="h-16 px-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 flex-shrink-0 bg-white dark:bg-[#0F172A]">
+          <Logo />
+
           <button
-            onClick={() => handleNavClick('dashboard')}
-            className="text-left focus:outline-none cursor-pointer"
+            onClick={onToggleSidebar}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+            aria-label="Close sidebar"
+            title="Close sidebar"
           >
-            <Logo size="sm" showSubtitle={false} />
-          </button>
-          <button
-            onClick={onCloseMobile}
-            className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
-            aria-label="Close menu"
-          >
-            <X className="w-5 h-5" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
         </div>
 
@@ -217,11 +224,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     key={item.id}
                     id={`nav-item-${item.id}`}
                     onClick={() => handleNavClick(item.id)}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${
-                      isActive
-                        ? 'bg-blue-50 dark:bg-sky-950/50 text-blue-700 dark:text-sky-300 font-extrabold shadow-xs border border-blue-100 dark:border-sky-800/80'
-                        : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-sky-400 hover:bg-blue-50/50 dark:hover:bg-slate-800/60'
-                    }`}
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${isActive
+                      ? 'bg-blue-50 dark:bg-sky-950/50 text-blue-700 dark:text-sky-300 font-extrabold shadow-xs border border-blue-100 dark:border-sky-800/80'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-sky-400 hover:bg-blue-50/50 dark:hover:bg-slate-800/60'
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <span className={isActive ? 'text-blue-600 dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}>
@@ -259,11 +265,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     key={item.id}
                     id={`nav-item-${item.id}`}
                     onClick={() => handleNavClick(item.id)}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${
-                      isActive
-                        ? 'bg-blue-50 dark:bg-sky-950/50 text-blue-700 dark:text-sky-300 font-extrabold shadow-xs border border-blue-100 dark:border-sky-800/80'
-                        : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-sky-400 hover:bg-blue-50/50 dark:hover:bg-slate-800/60'
-                    }`}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${isActive
+                      ? 'bg-blue-50 dark:bg-sky-950/50 text-blue-700 dark:text-sky-300 font-extrabold shadow-xs border border-blue-100 dark:border-sky-800/80'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-sky-400 hover:bg-blue-50/50 dark:hover:bg-slate-800/60'
+                      }`}
                   >
                     <span className={isActive ? 'text-blue-600 dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}>
                       {item.icon}

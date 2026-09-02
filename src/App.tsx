@@ -56,7 +56,8 @@ import {
 export default function App() {
   // Navigation state - defaults to Webtixa Public Landing page clone
   const [currentSection, setCurrentSection] = useState<NavSection>('public-landing');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarDesktopOpen, setIsSidebarDesktopOpen] = useState(true);
 
   // Core Clinical State
   const [patients, setPatients] = useState<Patient[]>(INITIAL_PATIENTS);
@@ -273,19 +274,23 @@ export default function App() {
         unreadNotifsCount={notifications.filter((n) => !n.isRead).length}
         isOpenMobile={isSidebarOpen}
         onCloseMobile={() => setIsSidebarOpen(false)}
+        onToggleSidebar={() => setIsSidebarDesktopOpen((prev) => !prev)}
+        isSidebarDesktopOpen={isSidebarDesktopOpen}
         onOpenLanding={() => setCurrentSection('public-landing')}
         onSignOut={() => showToast('Session Ended', 'You have been safely signed out.', 'info')}
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
+      <div
+        className={`flex-1 flex flex-col min-w-0 overflow-hidden relative z-10 transition-all duration-300 ${isSidebarDesktopOpen ? 'lg:ml-64' : 'lg:ml-0'
+          }`}
+      >
         {/* Offline Triage Bar & Connectivity Alert */}
         <OfflineTriageBar
           patients={patients}
           onSelectPatient={handleSelectPatientWithBiometrics}
           onShowToast={(msg, type) => showToast('Offline Triage', msg, type)}
         />
-
         {/* Top Header */}
         <Header
           currentSection={currentSection}
@@ -296,7 +301,7 @@ export default function App() {
           onOpenMobileMenu={() => setIsSidebarOpen(true)}
           onSelectSection={setCurrentSection}
           onSelectPatient={handleSelectPatientWithBiometrics}
-          onSelectDoctor={() => {}}
+          onSelectDoctor={() => { }}
           onOpenAddPatient={() => setIsAddPatientOpen(true)}
           onOpenBookAppointment={() => setIsBookAppointmentOpen(true)}
           onOpenAICaseInvestigator={() => setIsCaseInvestigatorOpen(true)}
@@ -304,7 +309,7 @@ export default function App() {
         />
 
         {/* Scrollable Viewport */}
-        <main className="flex-1 overflow-y-auto px-4 sm:px-8 py-6">
+        <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4 sm:px-8 py-6">
           {currentSection === 'dashboard' && (
             <DashboardView
               currentUser={currentUser}

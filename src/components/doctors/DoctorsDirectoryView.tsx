@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Stethoscope,
   Search,
@@ -23,8 +23,44 @@ interface DoctorsDirectoryViewProps {
 export const DoctorsDirectoryView: React.FC<DoctorsDirectoryViewProps> = ({
   doctors = [],
   onOpenBookAppointment,
-  onShowToast = () => {},
+  onShowToast = () => { },
 }) => {
+  const [dbDoctors, setDbDoctors] = useState<Doctor[]>([]);
+  const [loadingDoctors, setLoadingDoctors] = useState(true);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await fetch('/api/doctors');
+        const data = await response.json();
+
+        if (data.success) {
+          const mappedDoctors: Doctor[] = data.doctors.map((doc: any) => ({
+            id: doc._id,
+            fullName: doc.name,
+            specialty: doc.specialization,
+            department: doc.department || 'General Medicine',
+            qualifications: doc.qualification || [],
+            pmdcNumber: doc.registrationNumber,
+            hospital: doc.hospital,
+            city: doc.city,
+            consultationFeePkr: doc.consultationFee,
+            avatarUrl: doc.avatarUrl || '',
+            isAvailableToday: doc.isAvailableToday ?? true,
+          }));
+
+          setDbDoctors(mappedDoctors);
+        }
+      } catch (error) {
+        console.error('Failed to fetch doctors:', error);
+        onShowToast();
+      } finally {
+        setLoadingDoctors(false);
+      }
+    };
+
+    fetchDoctors();
+  }, [onShowToast]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('All');
   const [selectedSpecialty, setSelectedSpecialty] = useState('All');
@@ -32,12 +68,14 @@ export const DoctorsDirectoryView: React.FC<DoctorsDirectoryViewProps> = ({
   const specialties = ['All', 'Cardiology', 'Pulmonology', 'Pediatrics', 'Neurology', 'Internal Medicine', 'Endocrinology'];
   const cities = ['All', 'Islamabad', 'Lahore', 'Karachi', 'Rawalpindi', 'Peshawar'];
 
-  const filteredDoctors = (doctors || []).filter((doc) => {
+  const doctorsToDisplay = dbDoctors.length > 0 ? dbDoctors : doctors;
+
+  const filteredDoctors = (doctorsToDisplay || []).filter((doc) => {
     const matchCity = selectedCity === 'All' || doc.city === selectedCity;
     const matchSpec = selectedSpecialty === 'All' || (doc.specialty || '').toLowerCase().includes(selectedSpecialty.toLowerCase());
-    
-    const qualString = Array.isArray(doc.qualifications) 
-      ? doc.qualifications.join(' ') 
+
+    const qualString = Array.isArray(doc.qualifications)
+      ? doc.qualifications.join(' ')
       : (doc.qualifications || '');
 
     const matchSearch =
